@@ -32,7 +32,7 @@ export default function Home() {
   useEffect( () => {
     requestAnimationFrame(animate)
     if(window.innerHeight){
-      setInnerHeight(innerHeight)
+      setInnerHeight(window.innerHeight)
     }
   }, [])
 
