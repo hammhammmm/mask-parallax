@@ -63,8 +63,8 @@ export default function Home() {
               animation: `${scrollY < innerHeight ? "fadeIn .5s ease-out" : "fadeOut 0.5s ease-in"} `,
     
             }}>
-            <source src="https://storage.googleapis.com/aristreet.com/videos/Hero_30sec%20vdo%20(1).mp4" type="video/mp4"/>
-            {/* <source src="/medias/nature.mp4" type="video/mp4"/> */}
+            {/* <source src="https://storage.googleapis.com/aristreet.com/videos/Hero_30sec%20vdo%20(1).mp4" type="video/mp4"/> */}
+            <source src="/medias/video.mp4" type="video/mp4"/>
           </video>
 
         <div 
