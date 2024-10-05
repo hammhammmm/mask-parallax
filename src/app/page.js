@@ -1,91 +1,79 @@
-'use client'
-import { useRef, useEffect,useState } from 'react';
-import styles from './page.module.css'
+"use client";
+import { useRef, useEffect } from "react";
+import styles from "./page.module.css";
 
 export default function Home() {
+  // Reference to the container element
+  const containerRef = useRef(null);
+  // Reference to the sticky mask element
+  const stickyMaskRef = useRef(null);
+  // Ref to store the eased scroll progress (mutable across renders)
+  const easedScrollProgress = useRef(0);
 
-  const container = useRef(null);
-  const stickyMask = useRef(null);
+  // Initial and target sizes for the mask animation
+  const initialMaskSize = 20; // Start zoomed out
+  const targetMaskSize = 0.3; // End at a smaller size (zoomed in)
+  const easing = 0.15; // Easing factor for smooth transition
 
-  // Start with a smaller size and zoom in
-  const initialMaskSize = 20;  // Start zoomed out
-  const targetMaskSize = 0.3;  // End at a smaller size (zoomed in)
-  const easing = 0.15;
-  let easedScrollProgress = 0;
-
-  const [scrollY, setScrollY] = useState(0)
-  const [innerHeight, setInnerHeight] = useState(0)
   useEffect(() => {
-      const handleScroll = () => {
-          setScrollY(window.scrollY)
+    let animationFrameId;
+
+    // Animation function to update mask size based on scroll progress
+    const animate = () => {
+      // Ensure the refs are available before proceeding
+      if (!containerRef.current || !stickyMaskRef.current) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
       }
 
-      // Attach the scroll event listener
-      window.addEventListener("scroll", handleScroll)
+      // Calculate the total scrollable height
+      const containerHeight =
+        containerRef.current.getBoundingClientRect().height;
+      const scrollableHeight = containerHeight - window.innerHeight;
 
-      // Clean up the event listener on component unmount
-      return () => {
-          window.removeEventListener("scroll", handleScroll)
-      }
-  }, [])
+      // Get the current scroll position of the sticky mask
+      const scrollPosition = stickyMaskRef.current.offsetTop;
 
-  useEffect( () => {
-    requestAnimationFrame(animate)
-    if(window.innerHeight){
-      setInnerHeight(window.innerHeight)
-    }
-  }, [])
+      // Calculate scroll progress as a value between 0 and 1
+      const scrollProgress = scrollPosition / scrollableHeight;
 
-  const animate = () => {
-    const maskSizeProgress = targetMaskSize + (initialMaskSize - targetMaskSize) * (1 - getScrollProgress());
-    stickyMask.current.style.webkitMaskSize = maskSizeProgress * 100 + "%";
-    requestAnimationFrame(animate)
-  }
+      // Apply easing to the scroll progress for smooth animation
+      const delta = scrollProgress - easedScrollProgress.current;
+      easedScrollProgress.current += delta * easing;
 
-  const getScrollProgress = () => {
-    const scrollProgress = stickyMask.current.offsetTop / (container.current.getBoundingClientRect().height - window.innerHeight);
-    const delta = scrollProgress - easedScrollProgress;
-    easedScrollProgress += delta * easing;
-    return easedScrollProgress;
-  }
+      // Calculate the current mask size based on eased scroll progress
+      const maskSizeProgress =
+        targetMaskSize +
+        (initialMaskSize - targetMaskSize) * (1 - easedScrollProgress.current);
+
+      // Update the CSS mask size property to create the zoom effect
+      stickyMaskRef.current.style.webkitMaskSize = `${maskSizeProgress * 100}%`;
+
+      // Continue the animation loop
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    // Start the animation loop
+    animationFrameId = requestAnimationFrame(animate);
+
+    // Cleanup function to cancel the animation frame on component unmount
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   return (
     <main className={styles.main}>
-      <div ref={container} className={styles.container}>
-       <p className={styles.ss}>{scrollY}</p>
-        
-        <div ref={stickyMask} className={styles.stickyMask}>
-          <video autoPlay muted loop
-          style={
-            {
-              transition: "0.5s ease-out",
-              opacity: `${scrollY < innerHeight ? 1 : 0} `,
-              animation: `${scrollY < innerHeight ? "fadeIn .5s ease-out" : "fadeOut 0.5s ease-in"} `,
-    
-            }}>
-            {/* <source src="https://storage.googleapis.com/aristreet.com/videos/Hero_30sec%20vdo%20(1).mp4" type="video/mp4"/> */}
-            <source src="/medias/video.mp4" type="video/mp4"/>
+      {/* Container element for the content */}
+      <div ref={containerRef} className={styles.container}>
+        {/* Sticky mask element that applies the zoom effect */}
+        <div ref={stickyMaskRef} className={styles.stickyMask}>
+          {/* Video element that plays in the background */}
+          <video autoPlay muted loop>
+            <source src="/images/AdobeStock_342759371.mp4" type="video/mp4" />
           </video>
-
-        <div 
-         style={{
-          transition: "0.5s ease-out",
-          opacity: `${scrollY >= innerHeight ? 1 : 0} `,
-          animation: `${scrollY >= innerHeight ? "fadeIn .5s ease-in" : "fadeOut 0.5s ease-out"} `,
-
-          background: "#432c99",
-          position: "fixed",
-          top: "0",
-          left: "0",
-          width: "100vw",
-          height: "100vh",
-          zIndex: "0",
-          backgroundSize: "cover",
-      }}></div>
-
         </div>
-
       </div>
     </main>
-  )
+  );
 }

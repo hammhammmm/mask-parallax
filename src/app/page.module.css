@@ -9,7 +9,6 @@
 }
 
 .stickyMask{
-  /* display: flex; */
   display: flex;
   overflow: hidden;
   position: sticky;
@@ -17,9 +16,7 @@
   height: 100vh;
   align-items: center;
   justify-content: center;
-  /* mask-image: url('/medias/mask.svg'); */
-  mask-image: url('/medias/sss.svg');
-  /* mask-position: 52.35% center; */
+  mask-image: url('/images/mask.svg');
   mask-position: 52.35% 42%;
   mask-repeat: no-repeat;
   mask-size: 0%;
@@ -29,23 +26,4 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
-}
-
-.bg{
-  top: 0;
-  left: 0;
-  background-color: blueviolet;
-  background-size: cover;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  z-index: 2;
-}
-
-.ss{
-  position: fixed;
-  top: 0;
-  left: 0;
-  color: red;
-  z-index: 99;
 }
